@@ -54,10 +54,10 @@ module JsClientBridge #:nodoc:
       end
 
       protected
-      
+
       def validation_errors_to_hash(data_object, message = "Sorry, we couldn't save your #{data_object.class.to_s.split('::').last}")
         short_type = data_object.class.to_s.split('::').last
-    
+
         validation = {
           '_status'       => 'validation',
           '_type'        => data_object.class.to_s,
@@ -65,9 +65,12 @@ module JsClientBridge #:nodoc:
           '_message'      => message,
           'validation'   => data_object.errors.to_hash,
         }
-    
-        validation['id'] = data_object.id.to_s unless data_object.new?
-    
+
+        if data_object.respond_to? :new?
+          validation['id'] = data_object.id.to_s unless data_object.new?
+        elsif data_object.respond_to? :new_record?
+          validation['id'] = data_object.id.to_s unless data_object.new_record?
+        end
         validation
       end
 
